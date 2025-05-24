@@ -1,25 +1,101 @@
 LOW = "1"
 MEDIUM = "2"
 HIGH = "3"
+
+NEW = "1"
+IN_PROGRESS = "2"
+DONE = "3"
+
 STATUS = {
+    NEW: "new",
+    IN_PROGRESS: "in progress",
+    DONE: "done"
+}
+
+PRIORITY = {
     LOW: "low",
     MEDIUM: "medium",
     HIGH: "high"
 }
 
+HR = "--------------------------------------------------------------------"
+
 tasks = {}
 
-def add_task(task):
-    file = open("tasks.txt", "w")
-    file.write(f"{task.get('ID')} | {task.get('Title')} | {task.get('Description')} | {task.get('Priority')} | {task.get('Status')}")
+def check_priority() -> str:
+    priority = ""
+    while priority.lower() not in PRIORITY.values():
+        priority = (input("Priority (high | medium | low): "))
+    return priority
+
+def check_status() -> str:
+    status = ""
+    while status.lower() not in STATUS.values():
+        status = (input("Status (new | in progress | done): "))
+    return status
+
+def priority_sort() -> None:
+    priority = {
+        "high": 1,
+        "medium": 2,
+        "low": 3
+    }
+
+    task_list = []
+
+    with open("tasks.txt", "r") as file:
+        for line in file:
+            task_sections = line.strip().split(" | ")
+            task = {
+                "ID": task_sections[0],
+                "Title": task_sections[1],
+                "Description": task_sections[2],
+                "Priority": task_sections[3].lower(),
+                "Status": task_sections[4]
+            }
+            task_list.append(task)
+    sorted_tasks = sorted(task_list, key=lambda task: priority.get(task["Priority"]))
+
+    for task in sorted_tasks:
+        print(f"{task.get('ID')} | {task.get('Title')} | {task.get('Description')} | {task.get('Priority')} | {task.get('Status')}\n")
+
+def status_sort() -> None:
+    status = {
+        "new": 1,
+        "in progress": 2,
+        "done": 3
+    }
+
+    task_list = []
+
+    with open("tasks.txt", "r") as file:
+        for line in file:
+            task_sections = line.strip().split(" | ")
+            task = {
+                "ID": task_sections[0],
+                "Title": task_sections[1],
+                "Description": task_sections[2],
+                "Priority": task_sections[3],
+                "Status": task_sections[4].lower()
+            }
+            task_list.append(task)
+    sorted_tasks = sorted(task_list, key=lambda task: status.get(task["Status"]))
+
+    for task in sorted_tasks:
+        print(f"{task.get('ID')} | {task.get('Title')} | {task.get('Description')} | {task.get('Priority')} | {task.get('Status')}\n")
+
+
+def add_task(task: dict) -> None:
+    file = open("tasks.txt", "a")
+    file.write(f"{task.get('ID')} | {task.get('Title')} | {task.get('Description')} | {task.get('Priority')} | {task.get('Status')}\n")
     file.close()
 
-def create_task():
+def create_task() -> None:
     task_id = len(tasks) + 1
-    task_title = input("Title:")
-    task_description = input("Description:")
-    task_priority = input("Priority:")
-    task_status = input("Status:")
+    task_title = input("Title: ")
+    task_description = input("Description: ")
+    task_priority = check_priority()
+    task_status = check_status()
     
     tasks[task_id] = {
         "ID": task_id,
@@ -33,8 +109,24 @@ def create_task():
 
 def print_tasks():
     file = open("tasks.txt", "r")
-    content = file.read()
-    print(f"-----------------------------\n{content}\n_____________________________\n")
+    while True:    
+        choise = input("1 - Отобразить задачи в изначальном виде\n2 - Отсортировать по статусу\n3 - Отсортировать по приоритету\n4 - Осуществить поиск по названию или описанию\n0 - Вернуться назад\n")
+        match choise:
+            case "1":
+                for line in file:
+                    print(line)
+            case "2":
+                status_sort()
+            case "3":
+                priority_sort()
+
+            case "0":
+                break
+
+
+
+    file.close()
+
 
 # def update_task():
 
@@ -59,11 +151,7 @@ def main():
 
 
 
-#     1 - Создать новую задачу
-#     2 - Просмотреть задач
-#     3 - Обновить задачу
-#     4 - Удалить задачу
-#     0 - Выйти из программы
+
 
 if __name__ == "__main__":
     main()
