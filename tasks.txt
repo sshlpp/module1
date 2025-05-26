@@ -1,3 +1,0 @@
-1 | First task | First description | high | done
-2 | 2 | 2 | high | new
-3 | 3 | 3 | medium | done

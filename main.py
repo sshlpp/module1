@@ -22,6 +22,22 @@ HR = "--------------------------------------------------------------------"
 
 tasks = {}
 
+def load_tasks() -> None:
+    global tasks
+    tasks = {}
+    with open("tasks.txt", "r") as file:
+        for line in file:
+            updated_tasks = line.split(" | ")
+            task_id = updated_tasks[0]
+            tasks[task_id] = {
+                "ID": task_id,
+                "Title": updated_tasks[1],
+                "Description": updated_tasks[2],
+                "Priority": updated_tasks[3],
+                "Status": updated_tasks[4]
+            }
+
+
 def check_priority() -> str:
     priority = ""
     while priority.lower() not in PRIORITY.values():
@@ -91,7 +107,7 @@ def add_task(task: dict) -> None:
     file.close()
 
 def create_task() -> None:
-    task_id = len(tasks) + 1
+    task_id = int(max(tasks.keys(), default=0)) + 1
     task_title = input("Title: ")
     task_description = input("Description: ")
     task_priority = check_priority()
@@ -105,6 +121,20 @@ def create_task() -> None:
         "Status": task_status
     }
     add_task(tasks[task_id])
+
+def name_search() -> None:
+    key_word = input("Введите ключевое слово: ")
+    task_list = []
+    with open("tasks.txt", "r") as file:
+        for line in file:
+            task_list.append(line.split(" | "))
+    updated_list = [task for task in task_list if key_word.lower() in task[1].lower() or key_word.lower() in task[2].lower()]
+    if len(updated_list) == 0:
+        print("Нет совпадений")
+        return
+    for task in updated_list:
+        print(" | ".join(task) + "\n")
+
     
 def print_tasks():
     file = open("tasks.txt", "r")
@@ -118,7 +148,8 @@ def print_tasks():
                 status_sort()
             case "3":
                 priority_sort()
-
+            case "4":
+                name_search()
             case "0":
                 break
     file.close()
@@ -237,7 +268,6 @@ def update_task():
                 update_status()
             case "0":
                 break
-        
 
 def del_task() -> None:
     id = input("Enter task ID: ")
@@ -265,10 +295,8 @@ def del_task() -> None:
         "Status": task[4]
     } for task in updated_list}
 
-
-
-
 def main():
+    load_tasks()
     while True:
         choise = input("1 - Создать новую задачу\n2 - Просмотреть задач\n3 - Обновить задачу\n4 - Удалить задачу\n0 - Выйти из программы\n")
         match choise:
@@ -283,11 +311,5 @@ def main():
             case "0":
                 break
 
-
-
-
-
-
 if __name__ == "__main__":
     main()
-
